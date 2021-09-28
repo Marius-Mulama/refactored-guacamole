@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken")
 
 const User = require("../models/user");
 const user = require("../models/user");
+const { use } = require("../routes/reviews");
 
 const regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/
 
@@ -22,12 +23,29 @@ function generate_otp(){
     
 }
 
+function create_token(id,uphone,isverified){
+    const token = jwt.sign({
+        phone:uphone,
+        userId: id,
+        verified:isverified
+        
+    }, 
+    process.env.JWT_KEY,
+    {
+        expiresIn:"720h"
+    }
+    );
+
+    return token;
+
+}
+
 
 //Signup
 exports.signup = (req,res,next) =>{
     const user_phone = req.body.phone;
     if(!regex.test(user_phone)){
-        return res.status(500).json({
+        return res.status(400).json({
             error:"Invalid phone Number"
         });
     }
@@ -58,7 +76,7 @@ exports.signup = (req,res,next) =>{
         
                     user.save()
                     .then(result =>{
-                        res.status(201).json({
+                        res.status(200).json({
                             message: 'User Created',
                             user:{
                                 user_id:result._id,
@@ -90,6 +108,7 @@ exports.confirm = (req,res,next)=>{
 
     User.findById(id).exec()
     .then(result =>{
+        var user = result;
         if(result.length < 1){ 
             return res.status(500).json({
                 error:err
@@ -105,24 +124,39 @@ exports.confirm = (req,res,next)=>{
                 return res.status(406).json({error:"Wrong Confirmation code"});
             }
 
+            console.log(user)
+
             User.updateOne({_id:id},{verified:true,otp:''}).exec()
             .then(result =>{
-                res.status(201).json({
+
+                console.log(typeof(result))
+               console.log(user._id)
+
+
+
+                console.log(use._id)
+                console.log(user.phone)
+
+                const token = create_token(user.user_id,user.user_phone,true)
+
+
+                res.status(200).json({
                     message:"Account Verified",
-                    userId:result._id,
-                    phone: result.phone
+                    userId:user._id,
+                    phone: user.phone,
+                    token:token
 
                 });
             })
             .catch(err =>{
-                res.status(500).json({
+               return res.status(500).json({
                     error:err
                 });
             });
         }
     })
     .catch(err =>{
-        res.status(500).json({
+        return res.status(500).json({
             error:err
         });
     });
@@ -151,7 +185,6 @@ exports.login = (req,res,next) =>{
 
         }
 
-
         bcrypt.compare(req.body.password, user[0].password, function(err, result){
             if(err){
                 return res.status(401).json({
@@ -165,23 +198,29 @@ exports.login = (req,res,next) =>{
                 const user_verified = user[0].verified;
                 if(!user_verified){
                     return res.status(403).json({
-                        error: 'Not verified',
-                        verify: 'http://localhost:8000/api/v1/accounts/signup/'+user[0]._id+'/confirm/'
+                        Message: 'Not verified',
+                        user:{
+                            user_id:user[0]._id,
+                            phone:user[0].phone
+
+                        }
+                        // verify: 'http://localhost:8000/api/v1/accounts/signup/'+user[0]._id+'/confirm/'
                     });
                 }
 
 
-                const token = jwt.sign({
-                    phone:user_phone,
-                    userId: user[0]._id,
-                    verified:user[0].user_verified
+                // const token = jwt.sign({
+                //     phone:user_phone,
+                //     userId: user[0]._id,
+                //     verified:user[0].user_verified
                     
-                }, 
-                process.env.JWT_KEY,
-                {
-                    expiresIn:"720h"
-                }
-                );
+                // }, 
+                // process.env.JWT_KEY,
+                // {
+                //     expiresIn:"720h"
+                // }
+                // );
+                const token = create_token(user[0].user_id,user[0].user_phone,user[0].user_verified)
 
                 return res.status(200).json({
                     Message: "Auth Succesfull",
