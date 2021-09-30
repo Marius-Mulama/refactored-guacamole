@@ -198,7 +198,7 @@ exports.login = (req,res,next) =>{
                 //Check if User has been confirmed or verified useing phone number
                 const user_verified = user[0].verified;
                 if(!user_verified){
-                    return res.status(403).json({
+                    return res.status(207).json({
                         message: 'Not verified',
                         user: user[0]._id,
                         phone:user[0].phone,
