@@ -110,7 +110,8 @@ exports.confirm = (req,res,next)=>{
     .then(result =>{
         var user = result;
         if(result.length < 1){ 
-            return res.status(500).json({
+            return res.status(403).json({
+                message:"User not found",
                 error:err
             });
         }else if(result.verified != false){
@@ -156,7 +157,7 @@ exports.confirm = (req,res,next)=>{
         }
     })
     .catch(err =>{
-        return res.status(500).json({
+        return res.status(501).json({
             error:err
         });
     });
