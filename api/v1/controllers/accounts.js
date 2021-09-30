@@ -199,9 +199,10 @@ exports.login = (req,res,next) =>{
                 const user_verified = user[0].verified;
                 if(!user_verified){
                     return res.status(403).json({
-                        Message: 'Not verified',
+                        message: 'Not verified',
                         user: user[0]._id,
-                        phone:user[0].phone
+                        phone:user[0].phone,
+                        token:''
                         // verify: 'http://localhost:8000/api/v1/accounts/signup/'+user[0]._id+'/confirm/'
                     });
                 }
@@ -221,7 +222,9 @@ exports.login = (req,res,next) =>{
                 const token = create_token(user[0].user_id,user[0].user_phone,user[0].user_verified)
 
                 return res.status(200).json({
-                    Message: "Auth Succesfull",
+                    message: "Auth Succesfull",
+                    user:user[0].id,
+                    phone:user[0].phone,
                     token: token
                 });
             }
