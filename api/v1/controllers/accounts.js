@@ -115,7 +115,7 @@ exports.confirm = (req,res,next)=>{
                 error:err
             });
         }else if(result.verified != false){
-            return res.status(200).json({
+            return res.status(422).json({
                 message:"User already Verified"
             })
 
@@ -200,11 +200,8 @@ exports.login = (req,res,next) =>{
                 if(!user_verified){
                     return res.status(403).json({
                         Message: 'Not verified',
-                        user:{
-                            user_id:user[0]._id,
-                            phone:user[0].phone
-
-                        }
+                        user: user[0]._id,
+                        phone:user[0].phone
                         // verify: 'http://localhost:8000/api/v1/accounts/signup/'+user[0]._id+'/confirm/'
                     });
                 }
