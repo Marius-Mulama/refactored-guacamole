@@ -16,6 +16,9 @@ router.delete('/delete',AccountController.delete_account);
 //modify Account
 router.patch("/edit",AccountController.edit_profile);
 
+//Resend confirmation Code
+router.post("/signup/resend",AccountController.resendCode);
+
 
 // router.get('/',(req,res)=>{
 //     res.status(200).json({message:"Default route"});

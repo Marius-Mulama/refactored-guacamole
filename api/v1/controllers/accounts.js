@@ -16,7 +16,7 @@ function generate_otp(){
         
     // Find the length of string
     var len = string.length;
-    for (let i = 0; i < 8; i++ ) {
+    for (let i = 0; i < 6; i++ ) {
         OTP += string[Math.floor(Math.random() * len)];
     }
     return OTP;
@@ -38,6 +38,46 @@ function create_token(id,uphone,isverified){
 
     return token;
 
+}
+ 
+function send_otp(user_phone){
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const client = require('twilio')(accountSid, authToken);
+
+    User.find({phone:user_phone}).exec()
+    .then(result =>{
+        console.log(result[0].otp)
+        if(result.length<1)return false;
+        otp = result[0].otp;
+        
+        client.messages
+        .create({
+            body: 'Account Verification code: '+ otp,
+            from: '+447897009540',
+            to: user_phone
+        })
+        .then(message => {
+            console.log(message.sid)
+            return true;
+        })
+        .catch(err =>{
+            console.log("erro occured");
+            return false;
+    
+        });
+
+    })
+    .catch(err =>{
+        console.log("error occured");
+        return false;
+    }); 
+
+    // const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    // const authToken = process.env.TWILIO_AUTH_TOKEN;
+    // const client = require('twilio')(accountSid, authToken);
+
+        return false;
 }
 
 
@@ -76,6 +116,11 @@ exports.signup = (req,res,next) =>{
         
                     user.save()
                     .then(result =>{
+                        if(send_otp(user_phone)){
+                            console.log("OTP Not Sent");
+                        } else{
+                            console.log("OTP Not Sent");
+                        }
                         res.status(200).json({
                             message: 'User Created',
                             user:{
@@ -260,4 +305,41 @@ exports.edit_profile = (req,res,next) =>{
 
 exports.delete_account = (req,res,next) =>{
     res.status(200).json({message:"Delete Account"});
+}
+
+exports.resendCode = (req,res)=>{
+    if(req.body.userId == null){
+        return res.status(500).json({
+            error:"Invalid parameters"
+        });
+    }
+    const user_id= req.body.userId;
+
+    User.find({_id:user_id}).exec()
+    .then(user =>{
+        console.log(user.length);
+        if(user.length <1){
+            return res.status(401).json({
+                error:"Invalid parameters. Non existent user"
+            });
+        }
+
+        //Integation with twilio goes here
+        //send_otp(user[0].phone);
+        if(send_otp(user[0].phone)){
+            return res.status(200).json({
+                message:"Confirmation code sent to "+`${user[0].phone}`
+            });
+        }
+
+    })
+    .catch(err =>{
+        return res.status(501).json({
+            message:"Unable to resend OTP",
+            error:err
+        });
+    });
+
+
+    res.status(200).json({message:"working fine"});
 }
