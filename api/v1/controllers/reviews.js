@@ -3,8 +3,14 @@ const mongoose = require("mongoose");
 //models import
 const Review = require("../models/review");
 const Business = require("../models/business");
+const review = require("../models/review");
 
 exports.reviews_get_all = (req,res,next)=>{
+    if(res.locals.user) {
+        //console.log(res.locals.user);
+        const userId = res.locals.user;
+    }
+
     res.status(200).json({message:"reviews get"});
 }
 
@@ -15,6 +21,19 @@ exports.get_individual_review = (req,res,next)=>{
 }
 
 exports.make_review = (req,res,next)=>{
+
+    //Incoming json Structure
+
+    // {
+    //     business:"business id"
+    //     review:"",
+    //     rating:"",
+    //     reviewer:"user id"
+
+
+    // }
+
+
     const id = req.params.businessId;
     //console.log(1);
 
@@ -39,7 +58,7 @@ exports.make_review = (req,res,next)=>{
     
         review.save()
         .then(result =>{
-            res.status(201).json({
+            res.status(200).json({
                 message:"Review was made",
                 review: result
             });

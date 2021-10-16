@@ -23,11 +23,12 @@ function generate_otp(){
     
 }
 
-function create_token(id,uphone,isverified){
+function create_token(id,isverified){
     const token = jwt.sign({
-        phone:uphone,
+        //phone:uphone,
         userId: id,
-        verified:isverified
+        verified:isverified,
+        class:"user"
         
     }, 
     process.env.JWT_KEY,
@@ -264,7 +265,12 @@ exports.login = (req,res,next) =>{
                 //     expiresIn:"720h"
                 // }
                 // );
-                const token = create_token(user[0].user_id,user[0].user_phone,user[0].user_verified)
+                
+                const token = create_token(user[0]._id, user[0].verified);
+
+                console.log(user[0].verified);
+
+                //console.log(typeof(user[0].user_id));
 
                 return res.status(200).json({
                     message: "Auth Succesfull",
