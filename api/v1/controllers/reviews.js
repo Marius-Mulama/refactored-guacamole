@@ -3,21 +3,60 @@ const mongoose = require("mongoose");
 //models import
 const Review = require("../models/review");
 const Business = require("../models/business");
-const review = require("../models/review");
+//const Review = require("../models/review");
 
 exports.reviews_get_all = (req,res,next)=>{
-    if(res.locals.user) {
-        //console.log(res.locals.user);
-        const userId = res.locals.user;
+    if(!res.locals.user) {
+        return res.status(500).json({error:"Erroor occured"})
     }
+    const reviewer = res.locals.user;
+    
+    Review.find({made_by:reviewer})
+    .select('id review rating made_on reply')
+    .exec()
+    .then(result =>{
+        res.status(200).json({
+            count:result.length,
+            reviews: result
+        });
 
-    res.status(200).json({message:"reviews get"});
+    }).catch(err =>{
+        res.status(500).json({
+            error:err
+        });
+    });
+        
+
 }
 
 
 exports.get_individual_review = (req,res,next)=>{
+    const id = req.params.businessId;
+    console.log(id)
 
-    res.status(200).json({message:"All reviews made"});
+    if(!res.locals.user){
+        return res.status(500).json({
+            error:"error"
+        });
+    }
+    const reviewer = res.locals.user;
+
+    Review.find({business_id:id, made_by:reviewer})
+    .select('id review rating made_on reply')
+    .exec()
+    .then(result =>{
+        return res.status(200).json({
+            count:result.length,
+            reviews: result
+        });
+
+    })
+    .catch(err =>{
+       return res.status(500).json({
+            error:err
+        });
+    });
+
 }
 
 exports.make_review = (req,res,next)=>{
@@ -46,22 +85,42 @@ exports.make_review = (req,res,next)=>{
         }
 
         //console.log(1);
-
+        const reviewer = res.locals.user;
 
         const review = new Review({
             _id:mongoose.Types.ObjectId(),
             review: req.body.review,
             rating: req.body.rating,
+            made_by:reviewer,
             business_id: id
         });
+        console.log("review json created");
 
     
         review.save()
         .then(result =>{
-            res.status(200).json({
-                message:"Review was made",
-                review: result
+
+            business.reviews.push(review);
+            business.markModified('reviews');
+            business.save()
+            .then(output=>{
+                res.status(200).json({
+                    message:"Review was made",
+                    review: result
+                });
+                console.log("done");
+            })
+            .catch(err =>{
+                console.log("Not Done")
+                console.log(err);
+                res.status(500).json({error: "review Not Made"});
             });
+
+console.log("6723bhchbc")
+            // res.status(200).json({
+            //     message:"Review was made",
+            //     review: result
+            // });
         })
         .catch(err =>{
             console.log(err);
@@ -105,5 +164,38 @@ exports.get_reviews = (req,res,next)=>{
 
 
 exports.delete_review = (req,res,next)=>{
-    res.status(200).json({message:"Delete review"});
+    
+    const revId = req.params.reviewId;
+
+    if(!res.locals.user){
+        return res.status(500).json({
+            error:"error"
+        });
+    }
+
+    const reviewer = res.locals.user;
+
+    Review.findOneAndRemove({_id:revId, made_by:reviewer}, function (err, success) {
+        if (err) {
+          return  res.status(500).json({
+            error:"error whie deleting review"
+        });
+
+        }
+
+        if(success){
+
+
+
+            return res.status(200).json({
+                message:"succesfully removed"
+            })
+
+        }else{
+            return res.status(404).json({
+                message:"Not existing"
+            })
+        }
+      });
+
 }

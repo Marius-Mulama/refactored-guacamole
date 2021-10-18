@@ -7,11 +7,6 @@ const reviewSchema = mongoose.Schema({
         ref:'Business', 
         required: true
     },
-    made_by:{
-        type:String,
-        required: true,
-        default:"Anonymous user"
-    },
     review:{
         type:String,
         required: true
@@ -21,6 +16,15 @@ const reviewSchema = mongoose.Schema({
         min:1, max:5,
         required: true
     },
+    made_by:{
+        type:mongoose.Schema.ObjectId,
+        ref:'Users',
+        required: true,
+    },
+    made_on: {
+        type: Date,
+        default: Date.now
+      },
     replied:{
         type:Boolean,
         default:false
