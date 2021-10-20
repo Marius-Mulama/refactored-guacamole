@@ -106,7 +106,10 @@ exports.make_review = (req,res,next)=>{
             .then(output=>{
                 res.status(200).json({
                     message:"Review was made",
-                    review: result
+                    id:review._id,
+                    review: result.review,
+                    rating:result.rating
+
                 });
                 console.log("done");
             })
