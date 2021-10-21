@@ -12,7 +12,7 @@ exports.reviews_get_all = (req,res,next)=>{
     const reviewer = res.locals.user;
     
     Review.find({made_by:reviewer})
-    .select('id review rating made_on reply')
+    .select('id review rating made_on reply business_name business_id')
     .exec()
     .then(result =>{
         res.status(200).json({
@@ -77,6 +77,7 @@ exports.make_review = (req,res,next)=>{
     //console.log(1);
 
     Business.findById(id)
+    .select('_id name')
     .then(business =>{
         if(!business){
             return res.status(404).json({
@@ -84,7 +85,7 @@ exports.make_review = (req,res,next)=>{
             });
         }
 
-        //console.log(1);
+        console.log(business);
         const reviewer = res.locals.user;
 
         const review = new Review({
@@ -92,7 +93,8 @@ exports.make_review = (req,res,next)=>{
             review: req.body.review,
             rating: req.body.rating,
             made_by:reviewer,
-            business_id: id
+            business_id: id,
+            business_name:business.name
         });
         console.log("review json created");
 
@@ -100,26 +102,17 @@ exports.make_review = (req,res,next)=>{
         review.save()
         .then(result =>{
 
-            business.reviews.push(review);
-            business.markModified('reviews');
-            business.save()
-            .then(output=>{
                 res.status(200).json({
                     message:"Review was made",
                     id:review._id,
+                    business_id:result.business_id,
+                    business_name:review.business_name,
                     review: result.review,
                     rating:result.rating
 
                 });
                 console.log("done");
-            })
-            .catch(err =>{
-                console.log("Not Done")
-                console.log(err);
-                res.status(500).json({error: "review Not Made"});
-            });
-
-console.log("6723bhchbc")
+                //console.log("6723bhchbc")
             // res.status(200).json({
             //     message:"Review was made",
             //     review: result
