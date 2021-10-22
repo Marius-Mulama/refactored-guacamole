@@ -147,7 +147,7 @@ exports.get_reviews = (req,res,next)=>{
     .then(result =>{
         res.status(200).json({
             count:result.length,
-            reviws: result
+            reviews: result
         });
     })
     .catch(err =>{
