@@ -142,7 +142,7 @@ exports.get_reviews = (req,res,next)=>{
     const id = req.params.businessId;
 
     Review.find({business_id:id})
-    .select('_id review rating reply')
+    .select('_id made_by business_name review rating reply')
     .exec()
     .then(result =>{
         res.status(200).json({
