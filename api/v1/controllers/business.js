@@ -76,12 +76,12 @@ exports.search_business = (req,res,next)=>{
         if(result.length<1){
             res.status(203).json({
                 count:result.length,
-                reviews: "Nothing found"
+                business: "Nothing found"
             });
         }
         res.status(200).json({
             count:result.length,
-            reviews: result
+            business: result
         });
     })
     .catch(err =>{
