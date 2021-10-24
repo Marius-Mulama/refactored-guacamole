@@ -13,6 +13,8 @@ router.get('/',checkAuth, ReviewController.reviews_get_all); //Get all revews ma
 
 router.get('/:businessId', ReviewController.get_reviews); //Reviews of a business
 
+router.get('/search/', ReviewController.search_business); //Search busness
+
 router.get('/:businessId/myreviews',checkAuth, ReviewController.get_individual_review);
 
 router.post('/:businessId', checkAuth, ReviewController.make_review); //protect route

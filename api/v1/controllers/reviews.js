@@ -195,3 +195,7 @@ exports.delete_review = (req,res,next)=>{
       });
 
 }
+
+exports.search_business = (req,res,next)=>{
+    return res.status.json({message:"Search Working"})
+}

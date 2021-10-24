@@ -45,7 +45,7 @@ exports.create_business = (req,res,next)=>{
 exports.show_all = (req,res,next)=>{
     Business.find()
     .select('name _id')
-    .exec()
+    .cc()
     .then(result =>{
         //console.log(result);
         const response ={
@@ -61,5 +61,35 @@ exports.show_all = (req,res,next)=>{
             message:err
         });
     });
+
+}
+
+exports.search_business = (req,res,next)=>{
+    console.log(req.query.q)
+    let query = req.query.q;
+    query = query.charAt(0).toUpperCase() + query.slice(1);
+    //{ rank: { $regex: 'Commander' } }
+    Business.find({$or:[{name:{ $regex: query}},{industry:{ $regex: query}}]} )
+    .select('_id name industry')
+    .exec()
+    .then(result =>{
+        if(result.length<1){
+            res.status(203).json({
+                count:result.length,
+                reviews: "Nothing found"
+            });
+        }
+        res.status(200).json({
+            count:result.length,
+            reviews: result
+        });
+    })
+    .catch(err =>{
+        res.status(500).json({
+            error:err
+        });
+    });
+    //return res.status(200).json({message:"Search Working"})
+
 
 }
