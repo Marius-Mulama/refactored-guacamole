@@ -349,3 +349,11 @@ exports.resendCode = (req,res)=>{
 
     res.status(200).json({message:"working fine"});
 }
+
+exports.getSummary = (req,res)=>{
+    const uId = res.locals.user;
+    return res.status(200).json({
+        message:"Works",
+        UserID:uId
+    })
+}
