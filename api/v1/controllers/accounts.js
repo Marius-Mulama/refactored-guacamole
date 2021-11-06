@@ -5,7 +5,11 @@ const jwt = require("jsonwebtoken")
 
 const User = require("../models/user");
 const user = require("../models/user");
-const { use } = require("../routes/reviews");
+// const { use } = require("../routes/reviews");
+
+//models import
+const Review = require("../models/review");
+const Business = require("../models/business");
 
 const regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/
 
@@ -352,8 +356,26 @@ exports.resendCode = (req,res)=>{
 
 exports.getSummary = (req,res)=>{
     const uId = res.locals.user;
-    return res.status(200).json({
-        message:"Works",
-        UserID:uId
+    var complainCount, pendingComplainsCount;
+    
+    Review.find({made_by:uId}).select('_id')
+    .exec()
+    .then(result=>{
+        const reviewCount = result.length;
+
+        return res.status(200).json({
+            message:"Works",
+            reviews:reviewCount,
+            complaints:complainCount,
+            pendingComplains:pendingComplainsCount
+        });
+        
     })
+    .catch(err=>{
+        res.status(500).json({
+            error:err
+        });
+    });
+
+    
 }

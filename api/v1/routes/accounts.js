@@ -22,7 +22,7 @@ router.patch("/edit",AccountController.edit_profile);
 router.post("/signup/resend",AccountController.resendCode);
 
 //Account Summary
-router.get("/",checkAuth ,AccountController.getSummary);
+router.get("/summary",checkAuth ,AccountController.getSummary);
 
 
 // router.get('/',(req,res)=>{
