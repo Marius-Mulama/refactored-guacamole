@@ -16,6 +16,7 @@ dotenv.config();
 const reviewsRoute = require("./api/v1/routes/reviews");
 const businessRoute = require("./api/v1/routes/business");
 const accountsRoute = require("./api/v1/routes/accounts");
+const complaintsRoute = require("./api/v1/routes/complains")
 const testRoute = require("./api/v1/routes/test");
 
 //Connect to mongoDB
@@ -30,6 +31,7 @@ mongoose.connect("mongodb+srv://Reviews:"+process.env.USER_DB_PASS+"@users.6h2lh
 app.use('/api/v1/reviews', reviewsRoute);
 app.use('/api/v1/business', businessRoute);
 app.use('/api/v1/accounts',accountsRoute);
+app.use('/api/v1/complaints', complaintsRoute);
 app.use('/api/v1/test',testRoute);
 
 
