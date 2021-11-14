@@ -83,6 +83,27 @@ exports.complain_get_one = (req,res)=>{
 
 }
 
+exports.complain_by_company = (req,res,next)=>{
+    const company = req.params.company;
+    const complainant = res.locals.user;
+
+
+    pool.query(queries.getByCompany,[company,complainant], (error,results)=>{
+        if(error){
+            res.status(500).json({
+                message:"An Error Occured"
+            });
+        }
+
+        console.log(results)
+
+        res.status(200).json({
+            count:results.rows.length,
+            results:results.rows
+        });
+    });
+}
+
 exports.make_complain = (req,res,next)=>{
     const company = req.params.company;
     const category = req.body.category;
