@@ -135,6 +135,30 @@ exports.make_complain = (req,res,next)=>{
    
 }
 
+
+exports.close_complain =(req,res,next)=>{
+    var complainId = req.params.complainId;
+    complainId = parseInt(complainId)
+
+    pool.query(queries.makeStateClosed,[2,complainId], (error,results)=>{
+        if(error){
+            console.log(error)
+            res.status(500).json({
+                message:"An Error Occured"
+            });
+        }
+
+        //console.log(results)
+
+        return res.status(200).json({
+            message:"Status Changed to Closed"
+        })
+
+    });
+
+
+}
+
 // module.exports = {
 
 // }

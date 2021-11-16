@@ -3,7 +3,10 @@ const addComplain = "INSERT INTO tblcomplaints (category, state, userid, complai
 const viewQueried = "SELECT * FROM tblcomplaints WHERE state = $1 AND userid = $2";
 const getOne = "SELECT * FROM tblcomplaints WHERE complaintnumber = $1 AND userid = $2";
 const getByCompany = "SELECT * FROM tblcomplaints WHERE company = $1 AND userid = $2";
-
+const makeStateProcessing = "UPDATE tblcomplaints SET state = $1 WHERE complaintnumber = $2";
+const makeStateClosed = "UPDATE tblcomplaints SET state = $1 WHERE complaintnumber = $2";
+const makeRemark = "UPDATE tblcomplaints SET remarks = $1 WHERE complaintnumber = $2";
+const addChat = "UPDATE tblcomplaints SET chatid = $1 WHERE complaintnumber = $2";
 
 module.exports = {
     addComplain,
@@ -11,5 +14,9 @@ module.exports = {
     viewQueried,
     getOne,
     getByCompany,
+    makeStateProcessing,
+    makeStateClosed,
+    makeRemark,
+    addChat,
 
 }

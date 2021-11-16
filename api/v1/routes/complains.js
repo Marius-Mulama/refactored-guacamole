@@ -23,6 +23,7 @@ router.get('/show/status?',checkAuth, ComplantsContoller.complain_get_by_status)
 router.get('/:complainId',checkAuth, ComplantsContoller.complain_get_one);
 
 //
+router.get('/close/:complainId',checkAuth,ComplantsContoller.close_complain);
 
 
 module.exports = router;

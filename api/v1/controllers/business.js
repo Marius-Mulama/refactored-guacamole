@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const pool  = require('../../../db');
+const queries = require('./queries');
 
 const Business = require('../models/business');
 
@@ -91,5 +93,61 @@ exports.search_business = (req,res,next)=>{
     });
     //return res.status(200).json({message:"Search Working"})
 
+
+}
+
+exports.review_reply = (req,res,next)=>{
+    res.status(200).json({message:"working"});
+}
+
+exports.to_processing = (req,res,next)=>{
+    var complainId = req.params.complainId;
+    complainId = parseInt(complainId)
+
+    //console.log(complainId)
+
+    pool.query(queries.makeStateProcessing,[1,complainId], (error,results)=>{
+        if(error){
+            console.log(error)
+            res.status(500).json({
+                message:"An Error Occured"
+            });
+        }
+
+        //console.log(results)
+
+        return res.status(200).json({
+            message:"Status Changed to Processing"
+        })
+
+    });
+
+}
+
+exports.close_complain =(req,res,next)=>{
+    var complainId = req.params.complainId;
+    complainId = parseInt(complainId)
+
+    pool.query(queries.makeStateClosed,[2,complainId], (error,results)=>{
+        if(error){
+            console.log(error)
+            res.status(500).json({
+                message:"An Error Occured"
+            });
+        }
+
+        //console.log(results)
+
+        return res.status(200).json({
+            message:"Status Changed to Closed"
+        })
+
+    });
+
+
+}
+
+exports.make_remarks = (req,res)=>{
+    const complainId = req.params.complainId;
 
 }
