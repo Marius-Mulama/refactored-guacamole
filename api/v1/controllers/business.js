@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const pool  = require('../../../db');
-const queries = require('./queries');
+const queries = require('../queries/businessqueries');
 
 const Business = require('../models/business');
 
@@ -148,6 +148,23 @@ exports.close_complain =(req,res,next)=>{
 }
 
 exports.make_remarks = (req,res)=>{
-    const complainId = req.params.complainId;
+    var complainId = req.params.complainId;
+    const remarks = req.body.remarks;
+
+    complainId = parseInt(complainId)
+
+    pool.query(queries.makeRemark,[remarks,complainId],(error,result)=>{
+        if(error){
+            console.log(error)
+            return res.status(500).json({
+                message:"Did not work"
+            })
+        }else{
+            res.status(201).json({
+                message:"Remark made Succesfully"
+            })
+        }
+    });
+
 
 }

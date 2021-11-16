@@ -64,6 +64,7 @@ exports.complain_get_one = (req,res)=>{
 
     pool.query(queries.getOne,[complainId,complainant], (error,results)=>{
         if(error){
+            console.log(error)
             res.status(500).json({
                 message:"An Error Occured"
             });
