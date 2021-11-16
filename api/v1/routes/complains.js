@@ -13,7 +13,7 @@ router.get('/', checkAuth, ComplantsContoller.complain_get_all);
 router.post('/make/:company',checkAuth, ComplantsContoller.make_complain);
 
 //Get complain by Company
-router.get('/:company/',checkAuth, ComplantsContoller.complain_by_company);
+router.get('/company/:company/',checkAuth, ComplantsContoller.complain_by_company);
 
 
 //Get Complains by theeir status
