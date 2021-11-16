@@ -17,7 +17,7 @@ router.get('/complains/pending/:complainId',BusinessController.to_processing)
 //change complain status to closed
 router.get('/complains/close/:complainId', BusinessController.close_complain);
 //make remarks 
-router.get("/complains/remarks/:complainId",BusinessController.make_remarks);
+router.post("/complains/remarks/:complainId",BusinessController.make_remarks);
 //
 
 module.exports = router;
