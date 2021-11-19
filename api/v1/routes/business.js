@@ -10,6 +10,9 @@ router.get("/", BusinessController.show_all)
 router.get('/search?', BusinessController.search_business); //Search busness
 
 
+router.get('/complains/summary', BusinessController.summary);
+
+
 //Reply to review
 //router.post('/reviews/reply/:reviewId', BusinessController.review_reply);
 //change complain status to processing

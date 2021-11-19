@@ -168,3 +168,67 @@ exports.make_remarks = (req,res)=>{
 
 
 }
+
+exports.summary = async(req,res)=>{
+    // let solvedComplains = getSolved();
+    // var processingComplains = getProcessing();
+    // var pendingComplains =getPending();
+
+
+    let solvedComplains = 0;
+    var processingComplains = 0;
+    var pendingComplains =0;
+    
+    let pd = await getPending();
+    let ps = await getProcessing()
+    let sl = await getSolved();
+
+  pendingComplains  = pd.rowCount;
+  processingComplains = ps.rowCount;
+  solvedComplains = sl.rowCount;
+
+    
+
+    res.status(200).json({
+        solved: solvedComplains,
+        pending:pendingComplains,
+        processing:processingComplains
+    })
+}
+
+
+
+async function getProcessing(){
+    try {
+        const res = await pool.query(queries.getprocessing);
+        return res;
+      } catch (err) {
+        return err.stack;
+      }
+}
+
+async function getPending() {
+    try {
+      const res = await pool.query(queries.getPending);
+      return res;
+    } catch (err) {
+      return err.stack;
+    }
+}
+
+
+async function getSolved() {
+    try {
+      const res = await pool.query(queries.getSolved);
+      return res;
+    } catch (err) {
+      return err.stack;
+    }
+  }  
+
+//   async function whateverFuncName () {
+//     var result = await selectFrom();
+
+//     //console.log(result.rowCount);
+//     return result.rowCount
+//  }

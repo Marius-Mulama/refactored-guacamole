@@ -7,6 +7,10 @@ const makeStateClosed = "UPDATE tblcomplaints SET state = $1 WHERE complaintnumb
 const makeRemark = "UPDATE tblcomplaints SET remarks = $1 WHERE complaintnumber = $2";
 const addChat = "UPDATE tblcomplaints SET chatid = $1 WHERE complaintnumber = $2";
 
+const getSolved = "SELECT * FROM tblcomplaints WHERE state=2"
+const getprocessing = "SELECT * FROM tblcomplaints WHERE state=1"
+const getPending = "SELECT * FROM tblcomplaints WHERE state=0"
+
 module.exports = {
     addComplain,
     viewAll,
@@ -16,5 +20,8 @@ module.exports = {
     makeStateClosed,
     makeRemark,
     addChat,
+    getPending,
+    getSolved,
+    getprocessing,
 
 }
