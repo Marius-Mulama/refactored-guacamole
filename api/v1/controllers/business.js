@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const pool  = require('../../../db');
+const queries = require('../queries/businessqueries');
 
 const Business = require('../models/business');
 
@@ -45,7 +47,7 @@ exports.create_business = (req,res,next)=>{
 exports.show_all = (req,res,next)=>{
     Business.find()
     .select('name _id')
-    .exec()
+    .cc()
     .then(result =>{
         //console.log(result);
         const response ={
@@ -63,3 +65,170 @@ exports.show_all = (req,res,next)=>{
     });
 
 }
+
+exports.search_business = (req,res,next)=>{
+    console.log(req.query.q)
+    let query = req.query.q;
+    query = query.charAt(0).toUpperCase() + query.slice(1);
+    //{ rank: { $regex: 'Commander' } }
+    Business.find({$or:[{name:{ $regex: query}},{industry:{ $regex: query}}]} )
+    .select('_id name industry')
+    .exec()
+    .then(result =>{
+        if(result.length<1){
+            res.status(203).json({
+                count:result.length,
+                business: "Nothing found"
+            });
+        }
+        res.status(200).json({
+            count:result.length,
+            business: result
+        });
+    })
+    .catch(err =>{
+        res.status(500).json({
+            error:err
+        });
+    });
+    //return res.status(200).json({message:"Search Working"})
+
+
+}
+
+exports.review_reply = (req,res,next)=>{
+    res.status(200).json({message:"working"});
+}
+
+exports.to_processing = (req,res,next)=>{
+    var complainId = req.params.complainId;
+    complainId = parseInt(complainId)
+
+    //console.log(complainId)
+
+    pool.query(queries.makeStateProcessing,[1,complainId], (error,results)=>{
+        if(error){
+            console.log(error)
+            res.status(500).json({
+                message:"An Error Occured"
+            });
+        }
+
+        //console.log(results)
+
+        return res.status(200).json({
+            message:"Status Changed to Processing"
+        })
+
+    });
+
+}
+
+exports.close_complain =(req,res,next)=>{
+    var complainId = req.params.complainId;
+    complainId = parseInt(complainId)
+
+    pool.query(queries.makeStateClosed,[2,complainId], (error,results)=>{
+        if(error){
+            console.log(error)
+            res.status(500).json({
+                message:"An Error Occured"
+            });
+        }
+
+        //console.log(results)
+
+        return res.status(200).json({
+            message:"Status Changed to Closed"
+        })
+
+    });
+
+
+}
+
+exports.make_remarks = (req,res)=>{
+    var complainId = req.params.complainId;
+    const remarks = req.body.remarks;
+
+    complainId = parseInt(complainId)
+
+    pool.query(queries.makeRemark,[remarks,complainId],(error,result)=>{
+        if(error){
+            console.log(error)
+            return res.status(500).json({
+                message:"Did not work"
+            })
+        }else{
+            res.status(201).json({
+                message:"Remark made Succesfully"
+            })
+        }
+    });
+
+
+}
+
+exports.summary = async(req,res)=>{
+    // let solvedComplains = getSolved();
+    // var processingComplains = getProcessing();
+    // var pendingComplains =getPending();
+
+
+    let solvedComplains = 0;
+    var processingComplains = 0;
+    var pendingComplains =0;
+    
+    let pd = await getPending();
+    let ps = await getProcessing()
+    let sl = await getSolved();
+
+  pendingComplains  = pd.rowCount;
+  processingComplains = ps.rowCount;
+  solvedComplains = sl.rowCount;
+
+    
+
+    res.status(200).json({
+        solved: solvedComplains,
+        pending:pendingComplains,
+        processing:processingComplains
+    })
+}
+
+
+
+async function getProcessing(){
+    try {
+        const res = await pool.query(queries.getprocessing);
+        return res;
+      } catch (err) {
+        return err.stack;
+      }
+}
+
+async function getPending() {
+    try {
+      const res = await pool.query(queries.getPending);
+      return res;
+    } catch (err) {
+      return err.stack;
+    }
+}
+
+
+async function getSolved() {
+    try {
+      const res = await pool.query(queries.getSolved);
+      return res;
+    } catch (err) {
+      return err.stack;
+    }
+  }  
+
+//   async function whateverFuncName () {
+//     var result = await selectFrom();
+
+//     //console.log(result.rowCount);
+//     return result.rowCount
+//  }

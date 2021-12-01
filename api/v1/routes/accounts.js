@@ -1,6 +1,8 @@
 const express = require("express");
-
 const router = express.Router();
+const checkAuth = require("../auth/check-auth");
+
+//Import Controller
 const AccountController = require("../controllers/accounts");
 
 //signup
@@ -15,6 +17,12 @@ router.post('/reset',AccountController.reset_password);
 router.delete('/delete',AccountController.delete_account);
 //modify Account
 router.patch("/edit",AccountController.edit_profile);
+
+//Resend confirmation Code
+router.post("/signup/resend",AccountController.resendCode);
+
+//Account Summary
+router.get("/summary",checkAuth ,AccountController.getSummary);
 
 
 // router.get('/',(req,res)=>{
